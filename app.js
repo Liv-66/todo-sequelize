@@ -137,6 +137,21 @@ app.get('/users/logout', (req, res) => {
   res.redirect('/users/login');
 });
 
+app.get('/todos/new', (req, res) => {
+  res.render('new');
+});
+
+app.post('/todos', async (req, res) => {
+  const { name } = req.body;
+  await Todo.create({
+    name,
+    createdAt: new Date(),
+    updatedAt: new Date(),
+    UserId: req.user.id,
+  });
+  res.redirect('/');
+});
+
 app.get('/todos/:id', async (req, res) => {
   try {
     const id = req.params.id;
