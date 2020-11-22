@@ -30,6 +30,14 @@ app.use(methodOverride('_method'));
 
 usePassport(app);
 
+app.use((req, res, next) => {
+  res.locals.isAuthenticated = req.isAuthenticated();
+  res.locals.user = req.user;
+  // res.locals.success_msg = req.flash('success_msg');
+  // res.locals.warning_msg = req.flash('warning_msg');
+  next();
+});
+
 app.get('/', async (req, res) => {
   try {
     const todos = await Todo.findAll({
@@ -95,7 +103,7 @@ app.post('/users/signup', async (req, res) => {
       email,
       password: hash,
     });
-    res.redirect('/');
+    res.redirect('/users/login');
   } catch (err) {
     console.log(err);
   }
@@ -125,7 +133,8 @@ app.post('/users/signup', async (req, res) => {
 });
 
 app.get('/users/logout', (req, res) => {
-  res.send('logout');
+  req.logout();
+  res.redirect('/users/login');
 });
 
 app.get('/todos/:id', async (req, res) => {
