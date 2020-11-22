@@ -5,6 +5,8 @@ const bcrypt = require('bcryptjs');
 const methodOverride = require('method-override');
 const session = require('express-session');
 
+if (process.env.NODE_ENV !== 'production') require('dotenv').config();
+
 const usePassport = require('./config/passport');
 const db = require('./models');
 const Todo = db.Todo;
@@ -53,6 +55,19 @@ const passport = require('passport');
 app.post(
   '/users/login',
   passport.authenticate('local', {
+    successRedirect: '/',
+    failureRedirect: '/users/login',
+  })
+);
+app.get(
+  '/auth/facebook',
+  passport.authenticate('facebook', {
+    scope: ['email', 'public_profile'],
+  })
+);
+app.get(
+  '/auth/facebook/callback',
+  passport.authenticate('facebook', {
     successRedirect: '/',
     failureRedirect: '/users/login',
   })
