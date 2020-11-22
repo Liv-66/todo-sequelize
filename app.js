@@ -141,4 +141,14 @@ app.get('/todos/:id', async (req, res) => {
   //     .catch((error) => console.log(error));
 });
 
+app.get('/todos/:id/edit', async (req, res) => {
+  try {
+    const id = req.params.id;
+    const todo = await Todo.findByPk(id);
+    res.render('edit', { todo: todo.toJSON() });
+  } catch (err) {
+    console.log(err);
+  }
+});
+
 module.exports = app;
