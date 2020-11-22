@@ -1,6 +1,7 @@
 const express = require('express');
 const exphbs = require('express-handlebars');
 const bodyParser = require('body-parser');
+const bcrypt = require('bcryptjs');
 const methodOverride = require('method-override');
 
 const db = require('./models');
@@ -43,13 +44,68 @@ app.get('/users/signup', (req, res) => {
   res.render('signup');
 });
 
-app.post('/users/signup', (req, res) => {
+app.post('/users/signup', async (req, res) => {
   const { name, email, password, confirmPassword } = req.body;
-  User.create({ name, email, password }).then((user) => res.redirect('/'));
+  const user = await User.findOne({ where: { email } });
+  if (user) {
+    console.log('User already exists');
+    return res.render('signup', {
+      name,
+      email,
+    });
+  }
+  try {
+    const salt = await bcrypt.genSalt(10);
+    const hash = await bcrypt.hash(password, salt);
+    await User.create({
+      name,
+      email,
+      password: hash,
+    });
+    res.redirect('/');
+  } catch (err) {
+    console.log(err);
+  }
+  //   User.findOne({ where: { email } }).then((user) => {
+  //     if (user) {
+  //       console.log('User already exists');
+  //       return res.render('register', {
+  //         name,
+  //         email,
+  //         password,
+  //         confirmPassword,
+  //       });
+  //     }
+  //     return bcrypt
+  //       .genSalt(10)
+  //       .then((salt) => bcrypt.hash(password, salt))
+  //       .then((hash) =>
+  //         User.create({
+  //           name,
+  //           email,
+  //           password: hash,
+  //         })
+  //       )
+  //       .then(() => res.redirect('/'))
+  //       .catch((err) => console.log(err));
+  //   });
 });
 
 app.get('/users/logout', (req, res) => {
   res.send('logout');
+});
+
+app.get('/todos/:id', async (req, res) => {
+  try {
+    const id = req.params.id;
+    const todo = await Todo.findByPk(id);
+    res.render('detail', { todo: todo.toJSON() });
+  } catch (err) {
+    console.log(err);
+  }
+  //   return Todo.findByPk(id)
+  //     .then((todo) => res.render('detail', { todo: todo.toJSON() }))
+  //     .catch((error) => console.log(error));
 });
 
 module.exports = app;
