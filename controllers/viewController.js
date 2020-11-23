@@ -1,11 +1,14 @@
 const db = require('../models');
 const Todo = db.Todo;
+
 exports.login = (req, res) => {
   res.render('login');
 };
+
 exports.signup = (req, res) => {
   res.render('signup');
 };
+
 exports.getTodos = async (req, res) => {
   try {
     UserId = req.user.id;
@@ -19,9 +22,11 @@ exports.getTodos = async (req, res) => {
     res.status(422).json(err);
   }
 };
+
 exports.createOne = (req, res) => {
   res.render('new');
 };
+
 exports.getOne = async (req, res) => {
   try {
     const id = req.params.id;
@@ -31,6 +36,7 @@ exports.getOne = async (req, res) => {
     console.log(err);
   }
 };
+
 exports.edit = async (req, res) => {
   try {
     const id = req.params.id;

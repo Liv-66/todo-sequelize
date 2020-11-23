@@ -8,7 +8,7 @@ exports.login = passport.authenticate('local', {
   failureRedirect: '/users/login',
 });
 
-exports.signup = async (req, res) => {
+exports.signup = async (req, res, next) => {
   const { name, email, password, confirmPassword } = req.body;
   const user = await User.findOne({ where: { email } });
   if (user) {
@@ -30,6 +30,7 @@ exports.signup = async (req, res) => {
   } catch (err) {
     console.log(err);
   }
+  next();
 };
 
 exports.logout = (req, res) => {
